@@ -3,7 +3,6 @@ package oak
 import (
 	"image"
 	"image/color"
-	"image/draw"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -196,11 +195,7 @@ func NewController() *Controller {
 	c.BackgroundColor = image.Black
 	c.setBackgroundCh = make(chan Background)
 	c.Driver = driver.Main
-	c.drawLoopPublishDef = func(c *Controller, tx screen.Texture) {
-		tx.Upload(zeroPoint, c.winBuffer, c.winBuffer.Bounds())
-		c.windowControl.Scale(c.windowRect, tx, tx.Bounds(), draw.Src)
-		c.windowControl.Publish()
-	}
+	c.drawLoopPublishDef = drawLoopPublishDef
 	c.drawLoopPublish = c.drawLoopPublishDef
 	c.bkgFn = func() image.Image {
 		return c.BackgroundColor

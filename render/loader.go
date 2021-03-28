@@ -2,15 +2,16 @@ package render
 
 import (
 	"image"
-	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/oakmound/oak/v2/fileutil"
 )
 
 var (
-	// Form ./assets/images,
-	// the default image directory.
-	wd, _ = os.Getwd()
+	// Form ...main/core.go/assets/images,
+	// the image directory.
+	wd, _ = fileutil.Getwd()
 	dir   = filepath.Join(
 		wd,
 		"assets",

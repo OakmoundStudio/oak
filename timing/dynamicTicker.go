@@ -71,7 +71,8 @@ func (dt *DynamicTicker) send(v time.Time) bool {
 // SetTick changes the rate at which a dynamic ticker
 // ticks
 func (dt *DynamicTicker) SetTick(d time.Duration) {
-	dt.resetCh <- time.NewTicker(d)
+	tck := time.NewTicker(d)
+	dt.resetCh <- tck
 }
 
 func (dt *DynamicTicker) close() {

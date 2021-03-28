@@ -2,10 +2,10 @@ package oak
 
 import (
 	"image"
-	"os"
 	"path/filepath"
 
 	"github.com/oakmound/oak/v2/dlog"
+	"github.com/oakmound/oak/v2/fileutil"
 	"github.com/oakmound/oak/v2/oakerr"
 	"github.com/oakmound/oak/v2/render"
 	"github.com/oakmound/shiny/driver"
@@ -51,7 +51,7 @@ func (c *Controller) Init(firstScene string) {
 	c.FrameRate = conf.FrameRate
 	c.DrawFrameRate = conf.DrawFrameRate
 
-	wd, _ := os.Getwd()
+	wd, _ := fileutil.Getwd()
 
 	render.SetFontDefaults(wd, conf.Assets.AssetPath, conf.Assets.FontPath,
 		conf.Font.Hinting, conf.Font.Color, conf.Font.File, conf.Font.Size,
@@ -75,15 +75,5 @@ func (c *Controller) Init(firstScene string) {
 		conf.Assets.AudioPath)
 
 	// TODO: languages
-	dlog.Info("Init Scene Loop")
-	go c.sceneLoop(firstScene, conf.TrackInputChanges, conf.DisableDebugConsole)
-	dlog.Info("Init asset load")
-	render.SetAssetPaths(imageDir)
-	go c.loadAssets(imageDir, audioDir)
-	if !conf.DisableDebugConsole {
-		dlog.Info("Init Console")
-		go c.debugConsole(c.debugResetCh, c.skipSceneCh, os.Stdin)
-	}
-	dlog.Info("Init Main Driver")
-	c.Driver(c.lifecycleLoop)
+	c.initDriver(firstScene, imageDir, audioDir)
 }

@@ -54,6 +54,8 @@ func (c *Controller) inputLoop() {
 			default:
 				c.TriggerKeyHeld(okey.Event(e))
 			}
+			return
+		// ... this is where we would respond to window focus events
 
 		// Send mouse events
 		//
@@ -85,8 +87,6 @@ func (c *Controller) inputLoop() {
 				eventName,
 			)
 			c.TriggerMouseEvent(mevent)
-
-		// There's something called a paint event that we don't respond to
 
 		// Size events update what we scale the screen to
 		case size.Event:

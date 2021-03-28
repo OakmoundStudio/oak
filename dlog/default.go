@@ -1,3 +1,5 @@
+//+build !js
+
 package dlog
 
 import (
@@ -93,12 +95,6 @@ func (l *logger) dLog(level Level, console, override bool, in ...interface{}) {
 // of also to stdout.
 func (l *logger) FileWrite(in ...interface{}) {
 	l.dLog(INFO, false, true, in...)
-}
-
-func truncateFileName(f string) string {
-	index := strings.LastIndex(f, "/")
-	lIndex := strings.LastIndex(f, ".")
-	return f[index+1 : lIndex]
 }
 
 func (l *logger) checkFilter(f string, in ...interface{}) bool {
