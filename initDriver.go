@@ -9,6 +9,7 @@ import (
 )
 
 func (c *Controller) initDriver(firstScene, imageDir, audioDir string) {
+	go c.loadAssets(imageDir, audioDir)
 	dlog.Info("Init Scene Loop")
 	go c.sceneLoop(firstScene, conf.TrackInputChanges, conf.DisableDebugConsole)
 	dlog.Info("Init Console")

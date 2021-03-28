@@ -20,8 +20,17 @@ github.com/hajimehoshi/go-mp3 v0.3.1/go.mod h1:qMJj/CSDxx6CGHiZeCgbiq2DSUkbK0Ubt
 github.com/hajimehoshi/oto v0.6.1/go.mod h1:0QXGEkbuJRohbJaxr7ZQSxnju7hEhseiPx2hrh6raOI=
 github.com/oakmound/libudev v0.2.1 h1:gaXuw7Pbt3RSRxbUakAjl0dSW6Wo3TZWpwS5aMq8+EA=
 github.com/oakmound/libudev v0.2.1/go.mod h1:zYF5CkHY+UP6lzWbPR+XoVAscl/s+OncWA//qWjMLUs=
+github.com/oakmound/shiny v0.4.1 h1:ZBVSFEUDKgFRqXMDcGyG+gdU0sM4cB6VjyHMZrBzkLo=
+github.com/oakmound/shiny v0.4.1/go.mod h1:cJDeJQ/6Ovs2IiM4xTXjIC8zGJnECKvj8BOpTJ4qrhI=
 github.com/oakmound/shiny v0.4.2 h1:QfkgNG4ktT0g8wTM6bjWn1uAPOBk6NoQVxD/Bvwt5xk=
 github.com/oakmound/shiny v0.4.2/go.mod h1:fEGagtAluRRrVkMQyzyL+G3j+TdsyOjrIajWunGmy3M=
+github.com/oakmound/shiny v0.4.3-0.20210328005519-2e778f38ef1c h1:wxnWzjTWlP0wdcCpXmxZG3jPTJRYQVVpQcxD4AkGua0=
+github.com/oakmound/shiny v0.4.3-0.20210328005519-2e778f38ef1c/go.mod h1:e8FxlBEkOdB6unqVQbRab/zW6ImDKzuX9J94DXNFYm0=
+github.com/oakmound/shiny v0.4.3-0.20210328180751-4c942f7e9c15 h1:iMXIOsLIRxM63Nuwk5bYnX7LG0h0PGP55PdtPaejRqo=
+github.com/oakmound/shiny v0.4.3-0.20210328180751-4c942f7e9c15/go.mod h1:Chf534cPaNMBEb1BnJJNtdZMN8C/nxAmPw9TE3aWKtk=
+github.com/oakmound/w32 v1.0.1-0.20210323130255-ae527b9640fd h1:YxcflMtlGytQYO91dGsMLfA/F21sfgjL+d6Ij7hf9bo=
+github.com/oakmound/w32 v1.0.1-0.20210323130255-ae527b9640fd/go.mod h1:dpkpOhlL+nWqkIEL/G8v6WKWpkWbBHaixL5oPAD4aB4=
+github.com/oakmound/w32 v2.0.0+incompatible h1:7YvN4e7uuHgAmOtDoKaTqOTLztKyTWt2cN8xvg894CI=
 github.com/oakmound/w32 v2.0.0+incompatible/go.mod h1:lzloWlclSXIU4cDr67WF8qjFFDO8gHHBIk4Qqe90enQ=
 github.com/oakmound/w32 v2.1.0+incompatible h1:vIkC6eJVOaAnwTTOyiVCGh24GoryPRmcvWq3cekkG2U=
 github.com/oakmound/w32 v2.1.0+incompatible/go.mod h1:lzloWlclSXIU4cDr67WF8qjFFDO8gHHBIk4Qqe90enQ=
@@ -50,6 +59,8 @@ golang.org/x/sys v0.0.0-20190310054646-10058d7d4faa/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190312061237-fead79001313/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872 h1:cGjJzUd8RgBw428LXP65YXni0aiGNA4Bl+ls8SmLOm8=
 golang.org/x/sys v0.0.0-20190429190828-d89cdac9e872/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210326220804-49726bf1d181 h1:64ChN/hjER/taL4YJuA+gpLfIMT+/NFherRZixbxOhg=
+golang.org/x/sys v0.0.0-20210326220804-49726bf1d181/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c h1:dUUwHk2QECo/6vqA44rthZ8ie2QXMNeKRTHCNY2nXvo=
