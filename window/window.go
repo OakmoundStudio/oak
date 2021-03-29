@@ -15,4 +15,6 @@ type Window interface {
 	Width() int
 	Height() int
 	Viewport() intgeom.Point2
+	IsDown(string) bool // shouldn't be here
+	SetScreen(int, int)
 }

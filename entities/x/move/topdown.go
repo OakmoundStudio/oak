@@ -1,39 +1,39 @@
 package move
 
 import (
-	oak "github.com/oakmound/oak/v2"
 	"github.com/oakmound/oak/v2/alg/floatgeom"
 	"github.com/oakmound/oak/v2/key"
 	"github.com/oakmound/oak/v2/physics"
+	"github.com/oakmound/oak/v2/scene"
 )
 
 // WASD moves the given mover based on its speed as W,A,S, and D are pressed
-func WASD(mvr Mover) {
-	TopDown(mvr, key.W, key.S, key.A, key.D)
+func WASD(ctx *scene.Context, mvr Mover) {
+	TopDown(ctx, mvr, key.W, key.S, key.A, key.D)
 }
 
 // Arrows moves the given mover based on its speed as the arrow keys are pressed
-func Arrows(mvr Mover) {
-	TopDown(mvr, key.UpArrow, key.DownArrow, key.LeftArrow, key.RightAlt)
+func Arrows(ctx *scene.Context, mvr Mover) {
+	TopDown(ctx, mvr, key.UpArrow, key.DownArrow, key.LeftArrow, key.RightAlt)
 }
 
 // TopDown moves the given mover based on its speed as the given keys are pressed
-func TopDown(mvr Mover, up, down, left, right string) {
+func TopDown(ctx *scene.Context, mvr Mover, up, down, left, right string) {
 	delta := mvr.GetDelta()
 	vec := mvr.Vec()
 	spd := mvr.GetSpeed()
 
 	delta.Zero()
-	if oak.IsDown(up) {
+	if ctx.Window.IsDown(up) {
 		delta.Add(physics.NewVector(0, -spd.Y()))
 	}
-	if oak.IsDown(down) {
+	if ctx.Window.IsDown(down) {
 		delta.Add(physics.NewVector(0, spd.Y()))
 	}
-	if oak.IsDown(left) {
+	if ctx.Window.IsDown(left) {
 		delta.Add(physics.NewVector(-spd.X(), 0))
 	}
-	if oak.IsDown(right) {
+	if ctx.Window.IsDown(right) {
 		delta.Add(physics.NewVector(spd.X(), 0))
 	}
 	vec.Add(delta)
@@ -44,11 +44,11 @@ func TopDown(mvr Mover, up, down, left, right string) {
 
 // CenterScreenOn will cause the screen to center on the given mover, obeying
 // viewport limits if they have been set previously
-func CenterScreenOn(mvr Mover) {
+func CenterScreenOn(ctx *scene.Context, mvr Mover) {
 	vec := mvr.Vec()
-	oak.SetScreen(
-		int(vec.X())-oak.Width()/2,
-		int(vec.Y())-oak.Height()/2,
+	ctx.Window.SetScreen(
+		int(vec.X())-ctx.Window.Width()/2,
+		int(vec.Y())-ctx.Window.Height()/2,
 	)
 }
 

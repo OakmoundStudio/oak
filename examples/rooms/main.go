@@ -66,7 +66,7 @@ func main() {
 					transitioning = false
 				}
 			} else {
-				move.WASD(char)
+				move.WASD(ctx, char)
 			}
 
 			return 0
