@@ -10,6 +10,8 @@ var (
 	viewportLocked = false
 )
 
-func AddCommand(s string, fn func([]string))                     {}
-func defaultDebugConsole()                                       {}
-func debugConsole(resetCh, skipScene chan bool, input io.Reader) {}
+func (c* Controller) AddCommand(s string, fn func([]string)) error {
+	return nil
+}
+func defaultDebugConsole()                                         {}
+func debugConsole(resetCh, skipScene chan bool, input io.Reader)   {}

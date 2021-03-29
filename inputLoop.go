@@ -6,93 +6,90 @@ import (
 	"github.com/oakmound/oak/v2/dlog"
 	okey "github.com/oakmound/oak/v2/key"
 	omouse "github.com/oakmound/oak/v2/mouse"
-	"github.com/oakmound/shiny/gesture"
 	"golang.org/x/mobile/event/key"
 	"golang.org/x/mobile/event/lifecycle"
 	"golang.org/x/mobile/event/mouse"
 	"golang.org/x/mobile/event/size"
 )
 
-var (
-	eFilter gesture.EventFilter
-	eventFn func() interface{}
-)
-
 func (c *Controller) inputLoop() {
 	for {
-		switch e := c.windowControl.NextEvent().(type) {
-		// We only currently respond to death lifecycle events.
-		case lifecycle.Event:
-			if e.To == lifecycle.StageDead {
-				dlog.Info("Window closed.")
-				// OnStop needs to be sent through TriggerBack, otherwise the
-				// program will close before the stop events get propagated.
-				dlog.Verb("Triggering OnStop.")
-				<-c.logicHandler.TriggerBack(event.OnStop, nil)
-				c.quitCh <- true
-				return
-			}
-			// ... this is where we would respond to window focus events
-			// TODO v3: window focus?? should be easy?
+		c.inputLoopSwitch()
+	}
+}
 
-		// Send key events
-		//
-		// Key events have two varieties:
-		// The "KeyDown" and "KeyUp" events, which trigger for all keys
-		// and specific "KeyDown$key", etc events which trigger only for $key.
-		// The specific key that is pressed is passed as the data interface for
-		// the former events, but not for the latter.
-		case key.Event:
-			// key.Code strings all begin with "Code". This strips that off.
-			//k := GetKeyBind()
-			// TODO v3: reevaluate key bindings-- we need the rune this event has
-			switch e.Direction {
-			case key.DirPress:
-				c.TriggerKeyDown(okey.Event(e))
-			case key.DirRelease:
-				c.TriggerKeyUp(okey.Event(e))
-			default:
-				c.TriggerKeyHeld(okey.Event(e))
-			}
+func (c *Controller) inputLoopSwitch() {
+	switch e := c.windowControl.NextEvent().(type) {
+	// We only currently respond to death lifecycle events.
+	case lifecycle.Event:
+		if e.To == lifecycle.StageDead {
+			dlog.Info("Window closed.")
+			// OnStop needs to be sent through TriggerBack, otherwise the
+			// program will close before the stop events get propagated.
+			dlog.Verb("Triggering OnStop.")
+			<-c.logicHandler.TriggerBack(event.OnStop, nil)
+			c.quitCh <- true
 			return
-		// ... this is where we would respond to window focus events
-
-		// Send mouse events
-		//
-		// Mouse events are parsed based on their button
-		// and direction into an event name and then triggered:
-		// 'MousePress', 'MouseRelease', 'MouseScrollDown', 'MouseScrollUp', and 'MouseDrag'
-		//
-		// The basic event name is meant for entities which
-		// want to respond to the mouse event happening -anywhere-.
-		//
-		// For events which have mouse collision enabled, they'll receive
-		// $eventName+"On" when the event occurs within their collision area.
-		//
-		// Mouse events all receive an x, y, and button string.
-		case mouse.Event:
-			button := omouse.Button(e.Button)
-			eventName := omouse.GetEventName(e.Direction, e.Button)
-			// The event triggered for mouse events has the same scaling as the
-			// render and collision space. I.e. if the viewport is at 0, the mouse's
-			// position is exactly the same as the position of a visible entity
-			// on screen. When not at zero, the offset will be exactly the viewport.
-			// Todo: consider incorporating viewport into the event, see the
-			// workaround needed in mouseDetails, and how mouse events might not
-			// propagate to their expected position.
-			mevent := omouse.NewEvent(
-				float64((((e.X - float32(c.windowRect.Min.X)) / float32(c.windowRect.Max.X-c.windowRect.Min.X)) * float32(c.ScreenWidth))),
-				float64((((e.Y - float32(c.windowRect.Min.Y)) / float32(c.windowRect.Max.Y-c.windowRect.Min.Y)) * float32(c.ScreenHeight))),
-				button,
-				eventName,
-			)
-			c.TriggerMouseEvent(mevent)
-
-		// Size events update what we scale the screen to
-		case size.Event:
-			//dlog.Verb("Got size event", e)
-			c.ChangeWindow(e.WidthPx, e.HeightPx)
 		}
+		// ... this is where we would respond to window focus events
+		// TODO v3: window focus?? should be easy?
+
+	// Send key events
+	//
+	// Key events have two varieties:
+	// The "KeyDown" and "KeyUp" events, which trigger for all keys
+	// and specific "KeyDown$key", etc events which trigger only for $key.
+	// The specific key that is pressed is passed as the data interface for
+	// the former events, but not for the latter.
+	case key.Event:
+		// key.Code strings all begin with "Code". This strips that off.
+		//k := GetKeyBind()
+		// TODO v3: reevaluate key bindings-- we need the rune this event has
+		switch e.Direction {
+		case key.DirPress:
+			c.TriggerKeyDown(okey.Event(e))
+		case key.DirRelease:
+			c.TriggerKeyUp(okey.Event(e))
+		default:
+			c.TriggerKeyHeld(okey.Event(e))
+		}
+	// ... this is where we would respond to window focus events
+
+	// Send mouse events
+	//
+	// Mouse events are parsed based on their button
+	// and direction into an event name and then triggered:
+	// 'MousePress', 'MouseRelease', 'MouseScrollDown', 'MouseScrollUp', and 'MouseDrag'
+	//
+	// The basic event name is meant for entities which
+	// want to respond to the mouse event happening -anywhere-.
+	//
+	// For events which have mouse collision enabled, they'll receive
+	// $eventName+"On" when the event occurs within their collision area.
+	//
+	// Mouse events all receive an x, y, and button string.
+	case mouse.Event:
+		button := omouse.Button(e.Button)
+		eventName := omouse.GetEventName(e.Direction, e.Button)
+		// The event triggered for mouse events has the same scaling as the
+		// render and collision space. I.e. if the viewport is at 0, the mouse's
+		// position is exactly the same as the position of a visible entity
+		// on screen. When not at zero, the offset will be exactly the viewport.
+		// Todo: consider incorporating viewport into the event, see the
+		// workaround needed in mouseDetails, and how mouse events might not
+		// propagate to their expected position.
+		mevent := omouse.NewEvent(
+			float64((((e.X - float32(c.windowRect.Min.X)) / float32(c.windowRect.Max.X-c.windowRect.Min.X)) * float32(c.ScreenWidth))),
+			float64((((e.Y - float32(c.windowRect.Min.Y)) / float32(c.windowRect.Max.Y-c.windowRect.Min.Y)) * float32(c.ScreenHeight))),
+			button,
+			eventName,
+		)
+		c.TriggerMouseEvent(mevent)
+
+	// Size events update what we scale the screen to
+	case size.Event:
+		//dlog.Verb("Got size event", e)
+		c.ChangeWindow(e.WidthPx, e.HeightPx)
 	}
 }
 

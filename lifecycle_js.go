@@ -4,9 +4,9 @@ package oak
 
 import (
 	"image"
-	"runtime"
 
 	"github.com/oakmound/oak/v2/collision"
+	"github.com/oakmound/oak/v2/alg/intgeom"
 	"github.com/oakmound/oak/v2/dlog"
 	"github.com/oakmound/oak/v2/event"
 	omouse "github.com/oakmound/oak/v2/mouse"
@@ -17,24 +17,21 @@ import (
 )
 
 var (
-	winBuffer     screen.Image
-	screenControl screen.Screen
-	windowControl screen.Window
 	firstSceneJs  string
 )
 
-func lifecycleLoop(inScreen screen.Screen) {
+func (c *Controller) lifecycleLoop(inScreen screen.Screen) {
 	dlog.Info("Init Lifecycle")
 
-	firstScene = firstSceneJs
+	c.firstScene = firstSceneJs
 
-	screenControl = inScreen
+	c.screenControl = inScreen
 	var err error
 
 	// The window buffer represents the subsection of the world which is available to
 	// be shown in a window.
 	dlog.Info("Creating window buffer")
-	winBuffer, err = screenControl.NewImage(image.Point{ScreenWidth, ScreenHeight})
+	c.winBuffer, err = c.screenControl.NewImage(image.Point{c.Width(), c.Height()})
 	if err != nil {
 		dlog.Error(err)
 		return
@@ -43,76 +40,78 @@ func lifecycleLoop(inScreen screen.Screen) {
 	// The window controller handles incoming hardware or platform events and
 	// publishes image data to the screen.\
 	dlog.Info("Creating window controller")
-	changeWindow(int32(conf.Screen.X), int32(conf.Screen.Y), ScreenWidth*conf.Screen.Scale, ScreenHeight*conf.Screen.Scale)
+	c.newWindow(int32(conf.Screen.X), int32(conf.Screen.Y), c.Width()*conf.Screen.Scale, c.Height()*conf.Screen.Scale)
 
-	go drawLoop()
-	inputLoopInit()
+	go c.drawLoop()
 	var prevScene string
 
-	SceneMap.CurrentScene = "loading"
+	c.SceneMap.CurrentScene = "loading"
 
 	result := new(scene.Result)
 
 	dlog.Info("First Scene Start")
 
-	drawCh <- true
-	drawCh <- true
+	c.drawCh <- true
+	c.drawCh <- true
 
 	dlog.Verb("Draw Channel Activated")
 
-	schedCt := 0
 	for {
-		ViewPos = image.Point{0, 0}
-		updateScreen(0, 0)
-		useViewBounds = false
+		c.ViewPos = intgeom.Point2{0, 0}
+		c.updateScreen(c.ViewPos)
+		c.useViewBounds = false
 
-		dlog.Info("Scene Start", SceneMap.CurrentScene)
+		dlog.Info("Scene Start", c.SceneMap.CurrentScene)
 		go func() {
-			dlog.Info("Starting scene in goroutine", SceneMap.CurrentScene)
-			s, ok := SceneMap.GetCurrent()
+			dlog.Info("Starting scene in goroutine", c.SceneMap.CurrentScene)
+			s, ok := c.SceneMap.GetCurrent()
 			if !ok {
-				dlog.Error("Unknown scene", SceneMap.CurrentScene)
+				dlog.Error("Unknown scene", c.SceneMap.CurrentScene)
 				panic("Unknown scene")
 			}
-			s.Start(prevScene, result.NextSceneInput)
-			transitionCh <- true
+			s.Start(&scene.Context{
+				PreviousScene: prevScene,
+				SceneInput:    result.NextSceneInput,
+				DrawStack:     c.DrawStack,
+				EventHandler:  c.logicHandler,
+				CallerMap:     c.CallerMap,
+				MouseTree:     c.MouseTree,
+				CollisionTree: c.CollisionTree,
+				Window:        c,
+			})
+			c.transitionCh <- true
 		}()
-		sceneTransition(result)
+		c.sceneTransition(result)
 		// Post transition, begin loading animation
 		dlog.Info("Starting load animation")
-		drawCh <- true
+		c.drawCh <- true
 		dlog.Info("Getting Transition Signal")
-		<-transitionCh
+		<-c.transitionCh
 		dlog.Info("Resume Drawing")
 		// Send a signal to resume (or begin) drawing
-		drawCh <- true
+		c.drawCh <- true
 
 		dlog.Info("Looping Scene")
 		cont := true
 		logicTicker := timing.NewDynamicTicker()
-		logicTicker.SetTick(timing.FPSToDuration(FrameRate))
-		scen, ok := SceneMap.GetCurrent()
+		logicTicker.SetTick(timing.FPSToDuration(c.FrameRate))
+		scen, ok := c.SceneMap.GetCurrent()
 		if !ok {
 			dlog.Error("missing scene")
 		}
 		for cont {
 			<-logicTicker.C
-			logicHandler.Update()
-			inputLoopSwitch()
-			logicHandler.Flush()
+			c.logicHandler.Update()
+			c.inputLoopSwitch()
+			c.logicHandler.Flush()
 			cont = scen.Loop()
-			schedCt++
-			if schedCt > 100 {
-				schedCt = 0
-				runtime.Gosched()
-			}
 		}
-		dlog.Info("Scene End", SceneMap.CurrentScene)
+		dlog.Info("Scene End", c.SceneMap.CurrentScene)
 
-		prevScene = SceneMap.CurrentScene
+		prevScene = c.SceneMap.CurrentScene
 
 		// Send a signal to stop drawing
-		drawCh <- true
+		c.drawCh <- true
 
 		// Reset any ongoing delays
 	delayLabel:
@@ -128,7 +127,7 @@ func lifecycleLoop(inScreen screen.Screen) {
 		// Reset transient portions of the engine
 		// We start by clearing the event bus to
 		// remove most ongoing code
-		logicHandler.Reset()
+		c.logicHandler.Reset()
 		// We follow by clearing collision areas
 		// because otherwise collision function calls
 		// on non-entities (i.e. particles) can still
@@ -136,14 +135,14 @@ func lifecycleLoop(inScreen screen.Screen) {
 		dlog.Verb("Event Bus Reset")
 		collision.Clear()
 		omouse.Clear()
-		event.ResetEntities()
+		event.ResetCallerMap()
 		render.ResetDrawStack()
-		render.PreDraw()
+		render.GlobalDrawStack.PreDraw()
 		dlog.Verb("Engine Reset")
 
 		// Todo: Add in customizable loading scene between regular scenes
 
-		SceneMap.CurrentScene, result = scen.End()
+		c.SceneMap.CurrentScene, result = scen.End()
 		// For convenience, we allow the user to return nil
 		// but it gets translated to an empty result
 		if result == nil {

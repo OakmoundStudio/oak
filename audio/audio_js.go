@@ -57,6 +57,11 @@ func LoadWav(directory, fileName string) (Audio, error) {
 func BatchLoad(baseFolder string) error {
 	return errors.New("Audio not supported on JS")
 }
+
+func BlankBatchLoad(baseFolder string) error {
+	return errors.New("Audio not supported on JS")
+}
+
 func GetActivePosWavChannel(frequency, freqRand int, fileNames ...string) (chan [3]int, error) {
 	soundCh := make(chan [3]int)
 	return soundCh, errors.New("Audio not supported on JS")
